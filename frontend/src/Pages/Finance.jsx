@@ -64,7 +64,8 @@ export default function Finance() {
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('recipientEmail', recipientEmail);
+    formData.append('recipientAddress', recipientEmail);
+
 
     try {
       const response = await fetch('http://localhost:5000/api/process-csv', {
