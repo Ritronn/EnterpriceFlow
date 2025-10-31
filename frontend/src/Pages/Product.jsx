@@ -40,7 +40,7 @@ export default function Product() {
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('recipientEmail', email);
+    formData.append('recipientAddress', email); // CHANGED: from recipientEmail to recipientAddress
 
     try {
       const res = await fetch('http://localhost:5000/api/upload-feedback', {

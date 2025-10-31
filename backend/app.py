@@ -98,34 +98,40 @@ def upload_feedback():
         if not file.filename.lower().endswith('.csv'):
             return jsonify({"error": "Only CSV files are allowed"}), 400
         
-        # Get recipient email from form data (required)
-        recipient_email = request.form.get('recipientEmail')
+        # FIXED: Changed from recipientEmail to recipientAddress
+        recipient_email = request.form.get('recipientAddress')
         if not recipient_email:
-            return jsonify({"error": "recipientEmail is required"}), 400
+            return jsonify({"error": "recipientAddress is required"}), 400
         
         # Prepare the request to Worqhat
         headers = {
             'Authorization': f'Bearer {WORQHAT_API_KEY}'
         }
         
+        # Reset file pointer and read content
+        file.seek(0)
+        file_content = file.read()
+        
         # Send CSV file to Worqhat workflow
         files = {
-            'file': (file.filename, file.stream, 'text/csv')
+            'file': (file.filename, file_content, 'text/csv')
         }
         
+        # FIXED: Changed from recipientEmail to recipientAddress
         data = {
-            'recipientEmail': recipient_email
+            'recipientAddress': recipient_email
         }
         
         # Debug logging
-        print(f"Sending to Worqhat (Feedback): recipientEmail={recipient_email}")
+        print(f"Sending to Worqhat (Feedback): recipientAddress={recipient_email}")
         
         # Make request to Worqhat
         response = requests.post(
             WORQHAT_CSV_API_URL,
             files=files,
             data=data,
-            headers=headers
+            headers=headers,
+            timeout=30
         )
         
         # Debug response
@@ -136,11 +142,14 @@ def upload_feedback():
         return jsonify({
             "status": "success",
             "message": "Feedback CSV processed successfully and top priority feedbacks sent to email",
-            "worqhat_response": response.json() if response.headers.get('content-type') == 'application/json' else response.text,
+            "worqhat_response": response.json() if 'application/json' in response.headers.get('content-type', '') else response.text,
             "status_code": response.status_code
-        }), response.status_code
+        }), 200 if response.status_code == 200 else response.status_code
         
     except Exception as e:
+        print(f"Error: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({
             "status": "error",
             "message": str(e)
@@ -162,34 +171,40 @@ def process_csv():
         if not file.filename.lower().endswith('.csv'):
             return jsonify({"error": "Only CSV files are allowed"}), 400
         
-        # Get recipient email from form data (required)
-        recipient_email = request.form.get('recipientEmail')
+        # FIXED: Changed from recipientEmail to recipientAddress
+        recipient_email = request.form.get('recipientAddress')
         if not recipient_email:
-            return jsonify({"error": "recipientEmail is required"}), 400
+            return jsonify({"error": "recipientAddress is required"}), 400
         
         # Prepare the request to Worqhat
         headers = {
             'Authorization': f'Bearer {WORQHAT_API_KEY}'
         }
         
+        # Reset file pointer and read content
+        file.seek(0)
+        file_content = file.read()
+        
         # Send CSV file to Worqhat workflow
         files = {
-            'file': (file.filename, file.stream, 'text/csv')
+            'file': (file.filename, file_content, 'text/csv')
         }
         
+        # FIXED: Changed from recipientEmail to recipientAddress
         data = {
-            'recipientEmail': recipient_email
+            'recipientAddress': recipient_email
         }
         
         # Debug logging
-        print(f"Sending to Worqhat: recipientEmail={recipient_email}")
+        print(f"Sending to Worqhat: recipientAddress={recipient_email}")
         
         # Make request to Worqhat using new API endpoint
         response = requests.post(
             WORQHAT_NEW_CSV_API_URL,
             files=files,
             data=data,
-            headers=headers
+            headers=headers,
+            timeout=30
         )
         
         # Debug response
@@ -200,11 +215,14 @@ def process_csv():
         return jsonify({
             "status": "success",
             "message": "CSV processed successfully",
-            "worqhat_response": response.json() if response.headers.get('content-type') == 'application/json' else response.text,
+            "worqhat_response": response.json() if 'application/json' in response.headers.get('content-type', '') else response.text,
             "status_code": response.status_code
-        }), response.status_code
+        }), 200 if response.status_code == 200 else response.status_code
         
     except Exception as e:
+        print(f"Error: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({
             "status": "error",
             "message": str(e)
