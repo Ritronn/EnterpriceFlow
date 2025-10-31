@@ -2,6 +2,9 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
@@ -10,7 +13,7 @@ CORS(app)
 WORQHAT_API_URL = 'https://api.worqhat.com/flows/file/40d88f7f-8f87-4990-9768-73eca6ed99f9'
 WORQHAT_CSV_API_URL = 'https://api.worqhat.com/flows/file/478a5489-85f4-4884-b35c-f8538f5d6a3c'
 WORQHAT_NEW_CSV_API_URL = 'https://api.worqhat.com/flows/file/195a9ad8-b230-4101-83d8-5dd4fa885c96'
-WORQHAT_API_KEY = 'wh_mhdmwx3bpUDhmAu5iAvCldIl7Aqxik89ulFBzhS'
+WORQHAT_API_KEY = os.getenv('WORQHAT_API_KEY')
 
 @app.route('/')
 def home():
